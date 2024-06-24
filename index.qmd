@@ -4,6 +4,21 @@ execute:
   message: false
   warning: false
 ---
+## Inroduction
+
+The World Happiness Report reviews the state of happiness in the world today and shows how the "science of happiness" explains personal and national variations in happiness.
+The scores are based on peoples assessments of their lives in each country.
+Individuals are asked the Cantril Ladder question:
+*Imagining a ladder with 10 steps, 10 being the best possible life, on which step do you see yourself?*
+
+This project looks at the latitude of each country to try and determine if there is a relationship between
+the latitude of a country and it's Ladder score.
+
+Data Sources:
+
+* The World Happiness Report: <https://worldhappiness.report>
+* Global country boundaries (ADMIN0) <https://www.naturalearthdata.com/downloads/>
+ 
 
 ```{r}
 #| label: setup
@@ -29,8 +44,8 @@ country_geom <- countries |>
 whr <- read_excel("DataForFigure2.1+with+sub+bars+2024.xls")
 whr_subset <- whr |>
   rename(country_name = `Country name`,
-         whs = `Ladder score`) |>
-  select(country_name, whs)
+         score = `Ladder score`) |>
+  select(country_name, score)
 
 # load table matching country names between above 2 datasets
 name_match <- read_csv("country_name_match.csv")
@@ -51,8 +66,8 @@ get_mid_latitude <- function(geometry) {
 
 # merge Wold Happiness indcators with geometry from country layer
 whr_withgeom <- country_geom |>
-  merge(name_match, by = "ADMIN") |>
-  merge(whr_subset, by = "country_name")
+  merge(name_match, by = "ADMIN", all.x = TRUE) |>
+  merge(whr_subset, by = "country_name", all.x = TRUE)
 
 # calculate mid-latitude per country
 whr_withgeom$mid_latitude <- whr_withgeom |>
@@ -60,10 +75,35 @@ whr_withgeom$mid_latitude <- whr_withgeom |>
 
 ```
 
+## Mapping Happiness Scores
+Simply mapping It is difficult to get a clear picture of global happiness from simply mapping happiness scores.
+
 ```{r}
-#| label: latitude / index graph
+#| label: worldmap_scores
+
+# Plot the choropleth map
+
+latitude_labels <- seq(-90, 90, by = 30)
+longitude_labels <- seq(-180, 180, by = 45)
+ggplot() +
+  geom_sf(data = whr_withgeom, aes(fill = score)) +
+    scale_fill_gradient(low = "lightblue",
+                      high = "darkblue",
+                      na.value = "grey96",
+                      name = "Score") +
+    labs(title = "Happiness Score by Country",
+         subtitle = "No data for grey areas",
+         caption = "Source: World Happiness Report, 2024") +
+    theme_minimal() 
+
+```
+
+## Graphing Happiness Scores with Mid-latitude
+
+```{r}
+#| label: latscore_graph
 whr_withgeom |>
-  ggplot(aes(x = whs, y = mid_latitude)) +
+  ggplot(aes(x = score, y = mid_latitude)) +
     geom_point() +
     geom_smooth(method = "lm", formula = "y ~ x") +
     scale_y_continuous(name = "Mid latitude",
@@ -74,7 +114,6 @@ whr_withgeom |>
     labs(title = "World Happiness Score by Country Latitude",
          subtitle = "Higher Latitiudes have slightly higher happiness scores",
          caption = "Source: https://worldhappiness.report, 2024")
-
 
 ```
 
