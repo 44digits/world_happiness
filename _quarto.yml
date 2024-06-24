@@ -2,7 +2,7 @@ project:
   type: website
 
 website:
-  title: "World Happiness Report and GIS"
+  title: "The World Happiness Report"
   navbar:
     left:
       - href: index.qmd
