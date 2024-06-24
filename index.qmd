@@ -5,6 +5,11 @@ execute:
   warning: false
 ---
 ## Inroduction
+Does the physical location of a country affect the happiness of its population?
+The World Happiness Report surveys individuals across the globe about their "happiness" and derives a score for each county.
+This project calculated the mid-latitude was calculated for each country in the Report.
+Northern countries seem to be more happy.
+
 
 The World Happiness Report reviews the state of happiness in the world today and shows how the "science of happiness" explains personal and national variations in happiness.
 The scores are based on peoples assessments of their lives in each country.
