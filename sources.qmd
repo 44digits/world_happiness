@@ -1,0 +1,8 @@
+---
+title: "Sources"
+---
+
+
+* The World Happiness Report: <https://worldhappiness.report>
+* Global country boundaries (ADMIN0) <https://www.naturalearthdata.com/downloads/>
+ 

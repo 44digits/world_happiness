@@ -7,6 +7,8 @@ website:
     left:
       - href: index.qmd
         text: Home
+      - latlon.qmd
+      - sources.qmd
       - about.qmd
 
 format:

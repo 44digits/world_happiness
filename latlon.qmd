@@ -1,0 +1,117 @@
+---
+title: "Lat/Lon"
+execute: 
+  echo: false
+  message: false
+  warning: false
+---
+
+```{r}
+#| label: setup
+
+library(tidyverse)
+library(sf)
+library(sp)
+library(readxl)
+
+```
+
+```{r}
+#| label: dataloading
+
+# load country layer
+countries <- st_read("natural_earth_vector.gpkg",
+                     layer = "ne_10m_admin_0_countries",
+                     quiet = TRUE)
+country_geom <- countries |>
+  select(ADMIN, geom)
+
+# load World Happiness indicators
+whr <- read_excel("DataForFigure2.1+with+sub+bars+2024.xls")
+whr_subset <- whr |>
+  rename(country_name = `Country name`,
+         score = `Ladder score`) |>
+  select(country_name, score)
+
+# load table matching country names between above 2 datasets
+name_match <- read_csv("country_name_match.csv")
+
+```
+
+
+```{r}
+#| label: datamunging
+# function to calculate country mid-latitude
+get_mid_latitude <- function(geometry) {
+  coords <- st_coordinates(geometry)
+  min_lat <- min(coords[, 2])
+  max_lat <- max(coords[, 2])
+  mid_lat <- ((max_lat - min_lat) / 2) + min_lat
+  return(mid_lat)
+}
+
+get_mid_longitude <- function(geometry) {
+  coords <- st_coordinates(geometry)
+  min_lon <- min(coords[, 1])
+  max_lon <- max(coords[, 1])
+  mid_lon <- ((max_lon - min_lon) / 2) + min_lon
+  return(mid_lon)
+}
+
+# merge Wold Happiness indcators with geometry from country layer
+whr_withgeom <- country_geom |>
+  merge(name_match, by = "ADMIN", all.x = TRUE) |>
+  merge(whr_subset, by = "country_name", all.x = TRUE)
+
+# calculate mid-latitude per country
+whr_withgeom$mid_latitude <- whr_withgeom |>
+  apply(1, function(row) get_mid_latitude(row$geometry))
+
+# calculate mid-longitude per country
+whr_withgeom$mid_longitude <- whr_withgeom |>
+  apply(1, function(row) get_mid_longitude(row$geometry))
+
+```
+
+
+## Graphing Happiness Scores with Mid-Latitude
+Countries with higher latitudes seem to have higher Happiness scores.
+This could be due to higher GDPs found in more-northern countries.
+
+
+```{r}
+#| label: latscore_graph
+whr_withgeom |>
+  ggplot(aes(x = score, y = mid_latitude)) +
+    geom_point() +
+    geom_smooth(method = "lm", formula = "y ~ x") +
+    scale_y_continuous(name = "Mid latitude",
+                       breaks = c(-60, -30, 0, 30, 60),
+                       limits = c(-80, 80)) +
+    scale_x_continuous(name = "World Happiness Score",
+                       breaks = seq(1,8)) +
+    labs(title = "World Happiness Score by Country Latitude",
+         subtitle = "Higher Latitiudes have slightly higher happiness scores",
+         caption = "Source: https://worldhappiness.report, 2024")
+
+```
+
+## Graphing Happiness Scores with Mid-Longitude
+Countries east of the prime meridian also seem to be happier.
+
+```{r}
+#| label: lonscore_graph
+whr_withgeom |>
+  ggplot(aes(x = score, y = mid_longitude)) +
+    geom_point() +
+    geom_smooth(method = "lm", formula = "y ~ x") +
+    scale_y_continuous(name = "Mid longitude",
+                       breaks = c(-120, -60, 0, 60, 120),
+                       limits = c(-100, 100)) +
+    scale_x_continuous(name = "World Happiness Score",
+                       breaks = seq(1,8)) +
+    labs(title = "World Happiness Score by Country Longitude",
+         subtitle = "Countries in the eastern hemisphere have higher happiness scores",
+         caption = "Source: https://worldhappiness.report, 2024")
+
+```

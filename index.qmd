@@ -4,10 +4,12 @@ execute:
   message: false
   warning: false
 ---
+# World Happiness and Geography
+
 ## Inroduction
 Does the physical location of a country affect the happiness of its population?
 The World Happiness Report surveys individuals across the globe about their "happiness" and derives a score for each county.
-This project calculated the mid-latitude was calculated for each country in the Report.
+This project examines the geographic location of each country in the Report with respect to it's  Ladder score.
 Northern countries seem to be more happy.
 
 
@@ -16,14 +18,9 @@ The scores are based on peoples assessments of their lives in each country.
 Individuals are asked the Cantril Ladder question:
 *Imagining a ladder with 10 steps, 10 being the best possible life, on which step do you see yourself?*
 
-This project looks at the latitude of each country to try and determine if there is a relationship between
-the latitude of a country and it's Ladder score.
+This project looks at the latitude and longitude of each country to try and determine if there is a relationship between
+the geographic location of a country and it's Ladder Happiness score.
 
-Data Sources:
-
-* The World Happiness Report: <https://worldhappiness.report>
-* Global country boundaries (ADMIN0) <https://www.naturalearthdata.com/downloads/>
- 
 
 ```{r}
 #| label: setup
@@ -81,7 +78,8 @@ whr_withgeom$mid_latitude <- whr_withgeom |>
 ```
 
 ## Mapping Happiness Scores
-Simply mapping It is difficult to get a clear picture of global happiness from simply mapping happiness scores.
+It is difficult to discern any patterns simply from mapping Happiness Scores.
+
 
 ```{r}
 #| label: worldmap_scores
@@ -103,22 +101,4 @@ ggplot() +
 
 ```
 
-## Graphing Happiness Scores with Mid-latitude
-
-```{r}
-#| label: latscore_graph
-whr_withgeom |>
-  ggplot(aes(x = score, y = mid_latitude)) +
-    geom_point() +
-    geom_smooth(method = "lm", formula = "y ~ x") +
-    scale_y_continuous(name = "Mid latitude",
-                       breaks = c(-60, -30, 0, 30, 60),
-                       limits = c(-80, 80)) +
-    scale_x_continuous(name = "World Happiness Score",
-                       breaks = seq(1,8)) +
-    labs(title = "World Happiness Score by Country Latitude",
-         subtitle = "Higher Latitiudes have slightly higher happiness scores",
-         caption = "Source: https://worldhappiness.report, 2024")
-
-```
 
