@@ -1,6 +1,6 @@
 # The World Happiness Report and Geography
 
-### Inroduction
+### Introduction
 Does the physical location of a country affect the happiness of its population?
 The World Happiness Report surveys individuals across the globe about their "happiness" and derives a score for each county.
 This project examines the geographic location of each country in the Report with respect to it's  Ladder score.
