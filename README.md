@@ -16,5 +16,8 @@ the geographic location of a country and it's Ladder Happiness score.
 
 ### Sources
 * The World Happiness Report: <https://worldhappiness.report>
+  * Excel spreadsheet: <https://happiness-report.s3.amazonaws.com/2024/DataForFigure2.1+with+sub+bars+2024.xls>
 * Global country boundaries (ADMIN0) <https://www.naturalearthdata.com/downloads/>
+  * Geopackage of layers: <https://naciscdn.org/naturalearth/packages/natural_earth_vector.gpkg.zip>
+
  
